@@ -22,3 +22,12 @@ Timestamp: Tue Jul 16 2024 16:16:42 GMT-0700 (Pacific Daylight Time)
 URL: /favicon.ico
 Timestamp: Tue Jul 16 2024 16:16:42 GMT-0700 (Pacific Daylight Time)
 
+URL: /
+Timestamp: Mon Aug 19 2024 12:22:27 GMT-0700 (Pacific Daylight Time)
+
+URL: /movies
+Timestamp: Mon Aug 19 2024 12:22:34 GMT-0700 (Pacific Daylight Time)
+
+URL: /movies
+Timestamp: Mon Aug 19 2024 12:26:44 GMT-0700 (Pacific Daylight Time)
+
