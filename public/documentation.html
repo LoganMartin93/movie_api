@@ -10,11 +10,8 @@
             line-height: 1.6;
             margin: 20px;
         }
-        h1 {
+        h1, h2 {
             color: #333;
-        }
-        h2 {
-            color: #555;
         }
         pre {
             background-color: #f4f4f4;
@@ -39,146 +36,66 @@
     <p><strong>Response Format:</strong></p>
     <pre>Welcome to my app!</pre>
 
-    <!-- CREATE: Add New User -->
-    <h2>2. Add New User</h2>
-    <p><strong>Description:</strong> Creates a new user and adds them to the list of users.</p>
+    <!-- Get all users -->
+    <h2>2. Get All Users</h2>
+    <p><strong>Description:</strong> Returns a list of all users.</p>
+    <p><strong>Endpoint URL:</strong> <code>/users</code></p>
+    <p><strong>Method Type:</strong> GET</p>
+    <p><strong>Query Parameters:</strong> None</p>
+    <p><strong>Request Body:</strong> None</p>
+    <p><strong>Response Format:</strong> A JSON array of user objects.</p>
+    <pre>
+[
+  {
+    "Username": "User1",
+    "Email": "user1@example.com",
+    "FavoriteMovies": ["MovieID1", "MovieID2"]
+  },
+  // other users...
+]
+    </pre>
+
+    <!-- Get a user by username -->
+    <h2>3. Get a User by Username</h2>
+    <p><strong>Description:</strong> Returns data about a single user by their username.</p>
+    <p><strong>Endpoint URL:</strong> <code>/users/:Username</code></p>
+    <p><strong>Method Type:</strong> GET</p>
+    <p><strong>Query Parameters:</strong> <code>Username</code> (String)</p>
+    <p><strong>Request Body:</strong> None</p>
+    <p><strong>Response Format:</strong> A JSON object with the user's details.</p>
+    <pre>
+{
+  "Username": "User1",
+  "Email": "user1@example.com",
+  "FavoriteMovies": ["MovieID1", "MovieID2"]
+}
+    </pre>
+
+    <!-- Add a new user -->
+    <h2>4. Add a New User</h2>
+    <p><strong>Description:</strong> Creates a new user and adds them to the database.</p>
     <p><strong>Endpoint URL:</strong> <code>/users</code></p>
     <p><strong>Method Type:</strong> POST</p>
     <p><strong>Request Body:</strong></p>
     <pre>
 {
-  "name": "John Doe",
-  "favoriteMovies": []
+  "Username": "User1",
+  "Password": "password123",
+  "Email": "user1@example.com",
+  "Birthday": "1990-01-01"
 }
     </pre>
     <p><strong>Response Format:</strong> Returns the newly created user object.</p>
     <pre>
 {
-  "id": "some-uuid",
-  "name": "John Doe",
-  "favoriteMovies": []
+  "Username": "User1",
+  "Email": "user1@example.com",
+  "FavoriteMovies": []
 }
     </pre>
 
-    <!-- UPDATE: Update User Information -->
-    <h2>3. Update User Information</h2>
-    <p><strong>Description:</strong> Updates the name of an existing user by ID.</p>
-    <p><strong>Endpoint URL:</strong> <code>/users/:id</code></p>
-    <p><strong>Method Type:</strong> PUT</p>
-    <p><strong>Query Parameters:</strong> <code>id</code> (User ID)</p>
-    <p><strong>Request Body:</strong></p>
-    <pre>
-{
-  "name": "Jane Doe"
-}
-    </pre>
-    <p><strong>Response Format:</strong> Returns the updated user object.</p>
-    <pre>
-{
-  "id": "some-uuid",
-  "name": "Jane Doe",
-  "favoriteMovies": []
-}
-    </pre>
-
-    <!-- POST: Add Movie to User's Favorites -->
-    <h2>4. Add Movie to User's Favorites</h2>
-    <p><strong>Description:</strong> Adds a movie title to a user's list of favorite movies by user ID.</p>
-    <p><strong>Endpoint URL:</strong> <code>/users/:id/:movieTitle</code></p>
-    <p><strong>Method Type:</strong> POST</p>
-    <p><strong>Query Parameters:</strong> <code>id</code> (User ID), <code>movieTitle</code> (Movie Title)</p>
-    <p><strong>Request Body:</strong> None</p>
-    <p><strong>Response Format:</strong> Confirmation message indicating the movie was added.</p>
-    <pre>" (movieTitle) has been added to user (id)'s array"</pre>
-
-    <!-- DELETE: Remove Movie from User's Favorites -->
-    <h2>5. Remove Movie from User's Favorites</h2>
-    <p><strong>Description:</strong> Removes a movie title from a user's list of favorite movies by user ID.</p>
-    <p><strong>Endpoint URL:</strong> <code>/users/:id/:movieTitle</code></p>
-    <p><strong>Method Type:</strong> DELETE</p>
-    <p><strong>Query Parameters:</strong> <code>id</code> (User ID), <code>movieTitle</code> (Movie Title)</p>
-    <p><strong>Request Body:</strong> None</p>
-    <p><strong>Response Format:</strong> Confirmation message indicating the movie was removed.</p>
-    <pre>"(movieTitle) has been removed from user (id)'s array"</pre>
-
-    <!-- DELETE: Delete User -->
-    <h2>6. Delete User</h2>
-    <p><strong>Description:</strong> Deletes a user from the list by ID.</p>
-    <p><strong>Endpoint URL:</strong> <code>/users/:id</code></p>
-    <p><strong>Method Type:</strong> DELETE</p>
-    <p><strong>Query Parameters:</strong> <code>id</code> (User ID)</p>
-    <p><strong>Request Body:</strong> None</p>
-    <p><strong>Response Format:</strong> Confirmation message indicating the user was deleted.</p>
-    <pre>"User (id) has been deleted"</pre>
-
-    <!-- READ: Get All Movies -->
-    <h2>7. Get All Movies</h2>
-    <p><strong>Description:</strong> Returns a list of all movies.</p>
-    <p><strong>Endpoint URL:</strong> <code>/movies</code></p>
-    <p><strong>Method Type:</strong> GET</p>
-    <p><strong>Query Parameters:</strong> None</p>
-    <p><strong>Request Body:</strong> None</p>
-    <p><strong>Response Format:</strong> A JSON array of movie objects.</p>
-    <pre>
-[
-  {
-    "Title": "Movie Title",
-    "Genre": { "Name": "Genre Name", "Description": "Genre Description" },
-    "Director": { "Name": "Director Name", "Bio": "Director Bio", "Birth": "Director Birth Date" },
-    // other movie details...
-  },
-  // other movies...
-]
-    </pre>
-
-    <!-- READ: Get Movie by Title -->
-    <h2>8. Get Movie by Title</h2>
-    <p><strong>Description:</strong> Returns data about a single movie by title.</p>
-    <p><strong>Endpoint URL:</strong> <code>/movies/:title</code></p>
-    <p><strong>Method Type:</strong> GET</p>
-    <p><strong>Query Parameters:</strong> <code>title</code> (Movie Title)</p>
-    <p><strong>Request Body:</strong> None</p>
-    <p><strong>Response Format:</strong> A JSON object with the movie details.</p>
-    <pre>
-{
-  "Title": "Movie Title",
-  "Genre": { "Name": "Genre Name", "Description": "Genre Description" },
-  "Director": { "Name": "Director Name", "Bio": "Director Bio", "Birth": "Director Birth Date" },
-  // other movie details...
-}
-    </pre>
-
-    <!-- READ: Get Genre by Name -->
-    <h2>9. Get Genre by Name</h2>
-    <p><strong>Description:</strong> Returns the details of a genre by its name.</p>
-    <p><strong>Endpoint URL:</strong> <code>/movies/genre/:genreName</code></p>
-    <p><strong>Method Type:</strong> GET</p>
-    <p><strong>Query Parameters:</strong> <code>genreName</code> (Genre Name)</p>
-    <p><strong>Request Body:</strong> None</p>
-    <p><strong>Response Format:</strong> A JSON object with the genre details.</p>
-    <pre>
-{
-  "Name": "Genre Name",
-  "Description": "Genre Description"
-}
-    </pre>
-
-    <!-- READ: Get Director by Name -->
-    <h2>10. Get Director by Name</h2>
-    <p><strong>Description:</strong> Returns the details of a director by their name.</p>
-    <p><strong>Endpoint URL:</strong> <code>/movies/directors/:directorName</code></p>
-    <p><strong>Method Type:</strong> GET</p>
-    <p><strong>Query Parameters:</strong> <code>directorName</code> (Director Name)</p>
-    <p><strong>Request Body:</strong> None</p>
-    <p><strong>Response Format:</strong> A JSON object with the director details.</p>
-    <pre>
-{
-  "Name": "Director Name",
-  "Bio": "Director Bio",
-  "Birth": "Director Birth Date",
-  // other director details...
-}
-    </pre>
-
-</body>
-</html>
+    <!-- Update a user's information -->
+    <h2>5. Update User Information</h2>
+    <p><strong>Description:</strong> Updates the information of an existing user by their username.</p>
+    <p><strong>Endpoint URL:</strong> <code>/users/:Username</code></p>
+    <p><strong>Method Type:</strong>

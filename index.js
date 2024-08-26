@@ -1,3 +1,11 @@
+const mongoose = require('mongoose');
+const Models = require('./models.js');
+
+const Movies = Models.Movie;
+const Users = Models.User;
+
+mongoose.connect('mongodb://localhost:27017/test', { useNewUrlParser: true, useUnifiedTopology: true });
+
 const express = require('express'),
     app = express(),
     bodyParser = require('body-parser'),
@@ -10,140 +18,145 @@ const morgan = require('morgan');
 // Middleware for logging
 app.use(morgan('common'));
 
-// In-memory list of top movies
-let movies = [
-  {
-    Title: 'Harry Potter and the Sorcerer\'s Stone',
-    Description : 'Based on the wildly popular J.K. Rowling\'s book about a young boy who on his eleventh birthday discovers, he is the orphaned boy of two powerful wizards and has unique magical powers.',
-    Author: 'J.K. Rowling',
-    Genre: {
-      Name: 'Fantasy',
-      Description: 'Fantasy is a genre of literature that features magical and supernatural elements that are not real'
-    },
-    Director: {
-      Name: 'Chris Columbus',
-      Bio: "Born in Pennsylvania and raised in Ohio, Chris Columbus was first inspired to make movies after seeing The Godfather at age 15. After enrolling at NYU film school, he sold his first screenplay (never produced) while a sophomore there. After graduation Columbus tried to sell his fourth script, Gremlins, with no success, until Steven Spielberg optioned it; Columbus moved to Los Angeles for a year during rewrites on the project in Spielberg's bungalow at Universal. After writing two more scripts for Spielberg, The Goonies and Young Sherlock Holmes, Columbus' own directing career was launched a few years later with Adventures in Babysitting. He is best known to audiences as the director of the runaway hit Home Alone, written and produced by John Hughes its sequel Home Alone 2, and most recently Mrs. Doubtfire.",
-      Birth: 1958 
-    },
-    ImageURL: "https://www.amazon.com/Harry-Potter-Sorcerers-Daniel-Radcliffe/dp/B0011AQLZQ",
-    Featured: false
-  },
-  {
-    Title: 'Lord of the Rings',
-    Description : 'In the first part, The Lord of the Rings, a shy young hobbit named Frodo Baggins inherits a simple gold ring that holds the secret to the survival--or enslavement--of the entire world.',
-    Author: 'J.R.R. Tolkien',
-    Genre: {
-      Name: 'Adventure',
-      Description: 'Adventure stories are a genre that involve protagonists going on epic journeys. '
-    },
-    Director: {
-      Name: 'Peter Jackson',
-      Bio:  "Sir Peter Jackson made history with The Lord of the Rings trilogy, becoming the first person to direct three major feature films simultaneously. The Fellowship of the Ring, The Two Towers and The Return of the King were nominated for and collected a slew of awards from around the globe, with The Return of the King receiving his most impressive collection of awards. This included three Academy Awards® (Best Adapted Screenplay, Best Director and Best Picture), two Golden Globes (Best Director and Best Motion Picture-Drama), three BAFTAs (Best Adapted Screenplay, Best Film and Viewers' Choice), a Directors Guild Award, a Producers Guild Award and a New York Film Critics Circle Award.",
-      Birth: 1961
-    },
-    ImageURL: "https://www.amazon.com/Lord-Rings-Fellowship-Ring/dp/B000YMH4CG",
-    Featured: false
-  },
-  {
-    Title: 'Twilight',
-    Description : 'When Bella Swan moves to a small town in the Pacific Northwest, she falls in love with Edward Cullen, a mysterious classmate who reveals himself to be a 108-year-old vampire.',
-    Author: 'Stephanie Meyer',
-    Genre: {
-      Name: 'Romance',
-      Description: 'The romance genre is a type of storytelling that explores love and romantic relationships between characters.'
-    },
-    Director: {
-      Name: 'Catherine Hardwicke',
-      Bio:  "Hardwicke's first film as a director was the Sundance winner THIRTEEN which explored the transition into teenage years with an authenticity that still captures young audiences (1.3 billion Tik Tok engagements.) Hardwicke directed LORDS OF DOGTOWN before she became best known as the director of TWILIGHT, which launched the blockbuster franchise and has since earned over three billion dollars. Recently her indie film PRISONER'S DAUGHTER premiered at TIFF 2022 and DREAMS IN THE WITCHHOUSE dropped on Netflix October 2022 as part of Guillermo del Toro's Cabinet of Curiosities. MAFIA MAMMA premieres in theaters on April 14 2023.",
-      Birth: 1955
-    },
-    ImageURL: "https://www.amazon.com/Twilight-Kristen-Stewart/dp/B001T5D6LK",
-    Featured: false
-  }
-];
 
-let users = [
-  {
-    id: 1,
-    name: "Kim",
-    favoriteMovies: ["Twilight"]
-  },
-  {
-    id: 2,
-    name: "Joe",
-    favoriteMovies: []
-  },
-]
+
+// Get all users
+app.get('/users', async (req, res) => {
+  await Users.find()
+    .then((users) => {
+      res.status(201).json(users);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
+});
+
+// Get a user by username
+app.get('/users/:Username', async (req, res) => {
+  await Users.findOne({ Username: req.params.Username })
+    .then((user) => {
+      res.json(user);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
+});
+
 
 // CREATE 
-app.post('/users', (req, res) => {
-  const newUser = req.body;
+//Add a user
+/* We’ll expect JSON in this format
+{
+  ID: Integer,
+  Username: String,
+  Password: String,
+  Email: String,
+  Birthday: Date
+}*/
+app.post('/users', async (req, res) => {
+  await Users.findOne({ Username: req.body.Username })
+    .then((user) => {
+      if (user) {
+        return res.status(400).send(req.body.Username + 'already exists');
+      } else {
+        Users
+          .create({
+            Username: req.body.Username,
+            Password: req.body.Password,
+            Email: req.body.Email,
+            Birthday: req.body.Birthday
+          })
+          .then((user) =>{res.status(201).json(user) })
+        .catch((error) => {
+          console.error(error);
+          res.status(500).send('Error: ' + error);
+        })
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send('Error: ' + error);
+    });
+});
 
-  if (newUser.name){
-    newUser.id = uuid.v4();
-    users.push(newUser);
-    res.status(201).json(newUser)
-  } else {
-    res.status(400).send('Users need names!')
-  }
-})
+// Update a user's info, by username
+/* We’ll expect JSON in this format
+{
+  Username: String,
+  (required)
+  Password: String,
+  (required)
+  Email: String,
+  (required)
+  Birthday: Date
+}*/
+app.put('/users/:Username', async (req, res) => {
+  await Users.findOneAndUpdate({ Username: req.params.Username }, 
+    { $set:
+    {
+      Username: req.body.Username,
+      Password: req.body.Password,
+      Email: req.body.Email,
+      Birthday: req.body.Birthday
+    }
+  },
+  { new: true }) // This line makes sure that the updated document is returned
+  .then((updatedUser) => {
+    res.json(updatedUser);
+  })
+  .catch((err) => {
+    console.error(err);
+    res.status(500).send('Error: ' + err);
+  })
 
-// UPDATE
-app.put('/users/:id', (req, res) => {
-  const { id } = req.params;
-  const updatedUser = req.body;
+});
 
-  let user = users.find( user => user.id == id );
+// Add a movie to a user's list of favorites
+app.post('/users/:Username/movies/:MovieID', async (req, res) => {
+  await Users.findOneAndUpdate({ Username: req.params.Username }, {
+     $push: { FavoriteMovies: req.params.MovieID }
+   },
+   { new: true }) // This line makes sure that the updated document is returned
+  .then((updatedUser) => {
+    res.json(updatedUser);
+  })
+  .catch((err) => {
+    console.error(err);
+    res.status(500).send('Error: ' + err);
+  });
+});
 
-  if (user) {
-    user.name = updatedUser.name;
-    res.status(200).json(user);
-  } else{
-    res.status(400).send('User not found')
-  }
-})
+// delete a movie to a user's list of favorites
+app.delete('/users/:Username/movies/:MovieID', async (req, res) => {
+  await Users.findOneAndUpdate({ Username: req.params.Username }, {
+     $pull: { FavoriteMovies: req.params.MovieID }
+   },
+   { new: true }) // This line makes sure that the updated document is returned
+  .then((updatedUser) => {
+    res.json(updatedUser);
+  })
+  .catch((err) => {
+    console.error(err);
+    res.status(500).send('Error: ' + err);
+  });
+});
 
-// POST
-app.post('/users/:id/:movieTitle', (req, res) => {
-  const { id, movieTitle } = req.params;
-
-  let user = users.find( user => user.id == id );
-
-  if (user) {
-    user.favoriteMovies.push(movieTitle)
-    res.status(200).send(`${movieTitle} has been added to user ${id}'s array`);
-  } else{
-    res.status(400).send('User not found')
-  }
-})
-
-// DELETE
-app.delete('/users/:id/:movieTitle', (req, res) => {
-  const { id, movieTitle } = req.params;
-
-  let user = users.find( user => user.id == id );
-
-  if (user) {
-    user.favoriteMovies = user.favoriteMovies.filter( title => title!== movieTitle);
-    res.status(200).send(`${movieTitle} has been removed from user ${id}'s array`);
-  } else{
-    res.status(400).send('no such user')
-  }
-})
-
-// DELETE
-app.delete('/users/:id', (req, res) => {
-  const { id } = req.params;
-
-  let user = users.find( user => user.id == id );
-
-  if (user) {
-    users = users.filter( user => user.id != id);
-    res.status(200).send(`user ${id} has been deleted`);
-  } else{
-    res.status(400).send('no such user')
-  }
-})
+// Delete a user by username
+app.delete('/users/:Username', (req, res) => {
+  Users.findOneAndDelete({ Username: req.params.Username })
+    .then((user) => {
+      if (!user) {
+        return res.status(400).send(`${req.params.Username} was not found`);
+      }
+      res.status(200).send(`${req.params.Username} was deleted.`);
+    })
+    .catch((err) => {
+      console.error('Deletion error:', err.message);
+      res.status(500).send('Something broke! Error: ' + err.message);
+    });
+});
 
 
 // ROOT
@@ -151,48 +164,60 @@ app.get('/', (req, res) => {
   res.send('Welcome to my app!');
 });
 
-// READ
-app.get('/movies', (req, res) => {
-  res.status(200).json(movies);
+// Get all movies
+app.get('/movies', async (req, res) => {
+  await Movies.find()
+    .then((movies) => {
+      res.status(201).json(movies);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
 });
 
-
-// READ
-app.get('/movies/:title', (req, res) => {
-  const { title } = req.params;
-  const movie = movies.find( movie => movie.Title === title);
-
-  if (movie) {
-    res.status(200).json(movie);
-  } else {
-    res.status(404).send('Movie not found');
-  }
+// Get a movie by title
+app.get('/movies/:Title', async (req, res) => {
+  await Movies.findOne({ Title: req.params.Title })
+    .then((movie) => {
+      res.json(movie);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
 });
 
-
-// READ
-app.get('/movies/genre/:genreName', (req, res) => {
-  const { genreName } = req.params;
-  const genre = movies.find( movie => movie.Genre.Name === genreName).Genre;
-
-  if (genre) {
-    res.status(200).json(genre);
-  } else {
-    res.status(404).send('Genre not found');
-  }
+// Get a genre by title
+app.get('/movies/genres/:Name', async (req, res) => {
+  await Movies.findOne({ 'Genre.Name': req.params.Name })
+    .then((movie) => {
+      if (movie) {
+        res.json(movie.Genre);
+      } else {
+        res.status(404).send('Genre not found');
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
 });
 
-
-// READ
-app.get('/movies/directors/:directorName', (req, res) => {
-  const { directorName } = req.params;
-  const director = movies.find( movie => movie.Director.Name === directorName).Director;
-
-  if (director) {
-    res.status(200).json(director);
-  } else {
-    res.status(404).send('Director not found');
-  }
+// Get a director by name
+app.get('/movies/directors/:Name', async (req, res) => {
+  await Movies.findOne({ 'Director.Name': req.params.Name })
+    .then((movie) => {
+      if (movie) {
+        res.json(movie.Director);
+      } else {
+        res.status(404).send('Director not found');
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
 });
 
 // Serves static documentation
