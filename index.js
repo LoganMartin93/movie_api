@@ -6,7 +6,10 @@ const Users = Models.User;
 
 //mongoose.connect('mongodb://localhost:27017/dbname', { useNewUrlParser: true, useUnifiedTopology: true });
 
-mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+.then(() => console.log('MongoDB connected'))
+.catch(err => console.error('MongoDB connection error:', err)); 
+
 
 
 const express = require('express'),
@@ -17,8 +20,6 @@ const express = require('express'),
 app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({ extended: true }));
-
-const cors = require('cors');
 
 const { check, validationResult } = require('express-validator');
 
@@ -34,6 +35,8 @@ const { check, validationResult } = require('express-validator');
    //return callback(null, true);
  //}
 //}));
+
+const cors = require('cors');
 
 app.use(cors());
 
